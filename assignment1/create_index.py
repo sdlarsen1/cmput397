@@ -1,6 +1,7 @@
 import os
 import sys
 import sqlite3
+import nltk
 
 
 def create_table():
@@ -11,6 +12,10 @@ def create_table():
                         pos INT)''')
     except:
         print("Table already exists, continuing...")
+
+
+# def parse_file():
+
 
 def main():
     conn = sqlite3.connect("a1.db")  # open / create db
@@ -26,7 +31,7 @@ def main():
 
     create_table()                         # create the index table
 
-    for file in dirList:
+    for file in dirList:                   # start parsing directory
         if ".txt" not in file:
             print(file)
 
