@@ -102,3 +102,4 @@ ENV/
 
 # other stuff
 cmput397_2k_movies
+*.db
