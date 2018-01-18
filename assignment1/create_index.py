@@ -14,7 +14,14 @@ def create_table():
         print("Table already exists, continuing...")
 
 
-# def parse_file():
+def parse_file(filename):
+    try:
+        infile = open(filename, 'r')
+        content = infile.read()
+        tokens = nltk.word_tokenize(content)
+        infile.close()
+    except:
+        print("Error opening file.")
 
 
 def main():
@@ -32,8 +39,9 @@ def main():
     create_table()                         # create the index table
 
     for file in dirList:                   # start parsing directory
-        if ".txt" not in file:
-            print(file)
+        if ".txt" in file:
+            # print(directory+file)
+            parse_file(directory+file)
 
 if __name__ == '__main__':
     main()
