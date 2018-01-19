@@ -8,7 +8,7 @@ def create_table():
     try:   # super temporary schema
         c.execute('''CREATE TABLE inverted_index(
                         term TEXT,
-                        doc INT,
+                        doc_id INT,
                         pos INT)''')
     except:
         print("Table already exists, continuing...")
@@ -19,9 +19,10 @@ def parse_file(filename):
         infile = open(filename, 'r')
         content = infile.read()
         tokens = nltk.word_tokenize(content)
+        # do other stuff here
         infile.close()
     except:
-        print("Error opening file.")
+        print("Error opening/parsing file.")
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
 
     try:
         directory = sys.argv[1]                  # find and open directory
-        dirList = os.listdir(directory)
+        file_list = os.listdir(directory)
 
     except:
         print("Must specify an existing directory.")
@@ -38,7 +39,7 @@ def main():
 
     create_table()                         # create the index table
 
-    for file in dirList:                   # start parsing directory
+    for file in file_list:                   # start parsing directory
         if ".txt" in file:
             # print(directory+file)
             parse_file(directory+file)
