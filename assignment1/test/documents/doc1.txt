@@ -1,1 +1,0 @@
-In a Boolean retrieval system, stemming never lowers precision.
