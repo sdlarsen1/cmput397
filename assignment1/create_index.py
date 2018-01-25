@@ -15,22 +15,22 @@ def init_db(c):
 
         # start creating tables
         c.execute('''
-            CREATE TABLE token (
+            CREATE TABLE Token (
             token TEXT,
             token_id INT,
             PRIMARY KEY(token_id)
             );''')
 
         c.execute('''
-            CREATE TABLE posting (
+            CREATE TABLE Posting (
             token_id INT,
             doc_id INT,
             offset INT,
-            FOREIGN KEY (token_id) REFERENCES token(token_id)
+            FOREIGN KEY (token_id) REFERENCES Token(token_id)
             );''')
 
         c.execute('''
-            CREATE INDEX token_idx ON token(token);''')
+            CREATE UNIQUE INDEX Token_idx ON Token(token);''')
 
     except:
         print("Issue setting up database.")
