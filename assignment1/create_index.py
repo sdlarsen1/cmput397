@@ -65,7 +65,7 @@ def index_tokens(c, tokens, doc_id):
     offest = 0
     for token in tokens:
         if not in_index(token, c):              # check if token already indexed
-            token_id = get_highest_id(token, c) + 1
+            token_id = get_highest_id(c) + 1
             c.execute('''
                 INSERT INTO Token VALUES (?,?);''',
                 (token, token_id))
@@ -77,7 +77,7 @@ def index_tokens(c, tokens, doc_id):
             (token_id, doc_id, offset))
 
         c.commmit()
-        offset +=1
+        offset += 1
 
 
 def in_index(token, c):
@@ -88,7 +88,7 @@ def get_token_id(token, c):
     return
 
 
-def get_highest_id(token, c):
+def get_highest_id(c):
     return
 
 
