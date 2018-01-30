@@ -64,32 +64,39 @@ def parse_file(filename):
 def index_tokens(c, tokens, doc_id):
     offest = 0
     for token in tokens:
-        if not in_index(token, c):              # check if token already indexed
+        token_id = in_index(token, c)
+        if token_id is not None:              # check if token already indexed
             token_id = get_highest_id(c) + 1
             c.execute('''
-                INSERT INTO Token VALUES (?,?);''',
-                (token, token_id))
-        else:
-            token_id = get_token_id(token, c)
+                INSERT INTO Token
+                VALUES (?,?);''', (token, token_id,))
 
         c.execute('''
-            INSERT INTO Posting VALUES (?, ?, ?);''',
-            (token_id, doc_id, offset))
+            INSERT INTO Posting
+            VALUES (?, ?, ?);''', (token_id, doc_id, offset,))
 
-        c.commmit()
         offset += 1
 
 
 def in_index(token, c):
-    return False
+    c.execute('''
+        SELECT token_id
+        FROM Token
+        WHERE token=?;''', (token,))
 
+    token_id = c.fetchone()
 
-def get_token_id(token, c):
-    return
+    if token_id is not None:
+        return int(token_id)
+
+    return None
 
 
 def get_highest_id(c):
-    return
+    c.execute('''SELECT MAX(token_id) FROM Token;''')
+    max_id = c.fetchone()
+
+    return int(max_id)
 
 
 def main():
@@ -113,6 +120,7 @@ def main():
             filename = file.split('_')          # filename: doc_#_xyz.txt
             doc_id = filename[1]
             index_tokens(c, tokens, doc_id)     # index the file
+            conn.commit()
 
 
 if __name__ == '__main__':
