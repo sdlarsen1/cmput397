@@ -9,9 +9,9 @@ from nltk.stem.porter import *
 def init_db(c):
     try:
         # cleanup
-        c.execute("DROP TABLE IF EXISTS token;")
-        c.execute("DROP TABLE IF EXISTS posting;")
-        c.execute("DROP INDEX IF EXISTS token_idx;")
+        c.execute("DROP TABLE IF EXISTS Token;")
+        c.execute("DROP TABLE IF EXISTS Posting;")
+        c.execute("DROP INDEX IF EXISTS Token_idx;")
 
         # start creating tables
         c.execute('''
