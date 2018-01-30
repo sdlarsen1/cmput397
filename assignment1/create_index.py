@@ -38,8 +38,6 @@ def init_db(c):
 
 
 def parse_file(filename):
-    punctuation = [',', '.', ';', ':', "'", '"']
-
     try:
         infile = open(filename, 'r')
         content = infile.read()
@@ -50,6 +48,7 @@ def parse_file(filename):
     tokens = nltk.word_tokenize(content)
     stemmer = PorterStemmer()
     stemmed_tokens = []
+    punctuation = [',', '.', ';', ':', "'", '"']
 
     for token in tokens:
         if token in punctuation:                    # ignore punctuation
@@ -63,6 +62,33 @@ def parse_file(filename):
 
 
 def index_tokens(c, tokens, doc_id):
+    offest = 0
+    for token in tokens:
+        if not in_index(token, c):              # check if token already indexed
+            token_id = get_highest_id(token, c) + 1
+            c.execute('''
+                INSERT INTO Token VALUES (?,?);''',
+                (token, token_id))
+        else:
+            token_id = get_token_id(token, c)
+
+        c.execute('''
+            INSERT INTO Posting VALUES (?, ?, ?);''',
+            (token_id, doc_id, offset))
+
+        c.commmit()
+        offset +=1
+
+
+def in_index(token, c):
+    return False
+
+
+def get_token_id(token, c):
+    return
+
+
+def get_highest_id(token, c):
     return
 
 
