@@ -62,11 +62,20 @@ def parse_file(filename):
 
 
 def index_tokens(c, tokens, doc_id):
-    offest = 0
+    offset = 0
     for token in tokens:
+        # print(token)
         token_id = in_index(token, c)
-        if token_id is not None:              # check if token already indexed
-            token_id = get_highest_id(c) + 1
+        # print("in_index result is:", token_id)
+
+        if token_id is None:              # check if token already indexed
+            token_id = get_highest_id(c)
+
+            if token_id is None:
+                token_id = 0        # if this first instance in index, assign id=0
+            else:
+                token_id += 1       # else incrememnt highest id value
+
             c.execute('''
                 INSERT INTO Token
                 VALUES (?,?);''', (token, token_id,))
@@ -87,7 +96,7 @@ def in_index(token, c):
     token_id = c.fetchone()
 
     if token_id is not None:
-        return int(token_id)
+        return token_id[0]
 
     return None
 
@@ -96,7 +105,7 @@ def get_highest_id(c):
     c.execute('''SELECT MAX(token_id) FROM Token;''')
     max_id = c.fetchone()
 
-    return int(max_id)
+    return max_id[0]
 
 
 def main():
@@ -121,6 +130,8 @@ def main():
             doc_id = filename[1]
             index_tokens(c, tokens, doc_id)     # index the file
             conn.commit()
+
+    conn.close()
 
 
 if __name__ == '__main__':

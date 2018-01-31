@@ -1,1 +1,0 @@
-Stemming should be invoked at indexing time, but not while processing a query. Stemming chops off the ends of a word.
