@@ -65,10 +65,10 @@ def index_tokens(c, tokens, doc_id):
     offset = 0
     for token in tokens:
         # print(token)
-        token_id = in_index(token, c)
+        token_id = in_index(token, c)       # check if token already indexed
         # print("in_index result is:", token_id)
 
-        if token_id is None:              # check if token already indexed
+        if token_id is None:                # if not in index, add it
             token_id = get_highest_id(c)
 
             if token_id is None:
