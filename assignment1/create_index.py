@@ -4,6 +4,7 @@ import sqlite3
 import nltk
 from nltk.stem import *
 from nltk.stem.porter import *
+nltk.download('punkt')
 
 
 def init_db(c):
@@ -125,7 +126,7 @@ def main():
     for file in file_list:                   # start parsing directory
         if ".txt" in file:
             tokens = parse_file(directory+file)
-            # print(tokens)
+            print(tokens)
             filename = file.split('_')          # filename: doc_#_xyz.txt
             doc_id = filename[1]
             index_tokens(c, tokens, doc_id)     # index the file
