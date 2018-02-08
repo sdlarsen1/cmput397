@@ -6,24 +6,44 @@ from nltk.stem import *
 from nltk.stem.porter import *
 
 
-def cosine(query, doc_tokens, N, c):
+def cosine(query, scores, N, c):
+
+    length = {}             # dict of lengths for each vector
 
     for word in query:
-        df_d = df_d = get_doc_frequency(word, c)
+        print(word)
+        df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
         tf_q = get_term_frequency(word, query)        # w.r.t. the query
-        tf_idf_q = tf_idf(tf_q, df_q, N)
+        w_q = tf_idf(tf_q, df_q, N)
 
+        for doc_id in range(N):
+            doc_tokens = get_doc_tokens(doc_id, c)
+            print(doc_tokens)
+            length[doc_id] = len(doc_tokens)
 
-        tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
+            tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
 
+            w_d = tf_idf(tf_d, df_d, N)
 
+            try:
+                scores[doc_id] += w_d * w_q
+            except:
+                scores[doc_id] = w_d * w_q
 
-    return
+    for doc_id in range(N):
+        scores[doc_id] /= length[doc_id]
+
+    return scores
 
 
 def tf_idf(tf, df, N):
     # use math.log10(x)
-    tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
+    print("tf =", tf, "df =", df)
+    if (tf > 0) and (df > 0):
+        tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
+    else:
+        tf_idf = 0
+
     return tf_idf
 
 
@@ -65,7 +85,10 @@ def get_doc_frequency(term, c):
     ''', (term,))
 
     freq = c.fetchone()
-    return freq[0]
+    if freq[0] is None:
+        return 0
+    else:
+        return freq[0]
 
 
 def get_term_frequency(term, doc_tokens):
@@ -99,17 +122,17 @@ def main():
         sys.exit()
 
     scores = {}                  # dict of docs and their score
-    magnitudes = {}              # dict of magnitudes of each vector
     doc_tokens = []
 
     N = get_number_docs(c)       # get number of docs in index
-    for doc_id in range(N):
-        # magic happens here
-        doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
-        print(doc_tokens)
-        magnitudes[doc_id] = len(doc_tokens)
-
-        scores[doc_id] = cosine(query, doc_tokens, N, c)
+    scores = cosine(query, scores, N, c)
+    # for doc_id in range(N):
+    #     # magic happens here
+    #     doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
+    #     print(doc_tokens)
+    #     magnitudes[doc_id] = len(doc_tokens)
+    #
+    #     scores = cosine(query, scores, N, c)
 
     #printing happens here
 
