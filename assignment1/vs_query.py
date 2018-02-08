@@ -51,11 +51,12 @@ def get_doc_frequency(term, c):
     term = PorterStemmer().stem(term.lower())  # compare stemmed tokens
 
     c.execute('''
-    SELECT p.doc_id, count(p.token_id)
+    SELECT SUM(Count)
+    FROM (SELECT COUNT(p.token_id) AS Count
     FROM Token t, Posting p
     WHERE t.token_id = p.token_id
     AND t.token = ?
-    GROUP BY (p.doc_id);
+    GROUP BY (p.doc_id));
     ''', (term,))
 
     freq = c.fetchone()
@@ -64,7 +65,7 @@ def get_doc_frequency(term, c):
 
 def get_term_frequency(term, doc_tokens):
     term = PorterStemmer().stem(term.lower())  # compare stemmed tokens
-    
+
     count = 0
     for token in doc_tokens:
         if term == token:
