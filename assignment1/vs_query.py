@@ -8,6 +8,7 @@ def cosine(query, document, c):
 
 
 def tf_idf(term, document):
+    # use math.log10(x)
     return
 
 
@@ -19,6 +20,21 @@ def get_number_docs(c):
 
     num = c.fetchone()
     return num[0]
+
+
+def get_doc_tokens(doc_id, c):
+    c.execute('''
+    SELECT t.token
+    FROM token t, posting p
+    WHERE t.token_id = p.token_id
+    AND p.doc_id=?;
+    ''', (doc_id,))
+
+    tokens = []
+    for token in c.fetchall():
+        tokens.append(token[0])
+
+    return tokens
 
 
 def main():
@@ -41,11 +57,14 @@ def main():
         sys.exit()
 
     scores = {}
+    doc_tokens = []
 
     N = get_number_docs(c)       # get number of docs in index
-    for doc in range(N):
+    for doc_id in range(N):
         # magic happens here
-        scores[doc] = cosine(query, doc, c)
+        doc_tokens = get_doc_tokens(doc_id, c)
+        print(doc_tokens)
+        scores[doc_id] = cosine(query, doc_tokens, c)
 
     #printing happens here
 
