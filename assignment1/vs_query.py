@@ -114,13 +114,17 @@ def get_term_frequency_query(term, query):
     return count
 
 
+def print_k_highest(scores, k, print_scores):
+    return
+
+
 def main():
     try:
         index = sys.argv[1]
         conn = sqlite3.connect(index)
         c = conn.cursor()
 
-        print_num = sys.argv[2]
+        k = sys.argv[2]
         print_score = sys.argv[3]
 
         i = 4
@@ -139,15 +143,9 @@ def main():
     N = get_number_docs(c)       # get number of docs in index
     scores = cosine(query, scores, N, c)
     print(scores)
-    # for doc_id in range(N):
-    #     # magic happens here
-    #     doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
-    #     print(doc_tokens)
-    #     magnitudes[doc_id] = len(doc_tokens)
-    #
-    #     scores = cosine(query, scores, N, c)
 
     #printing happens here
+    print_k_highest(scores, k, print_score)
 
     conn.close()
 
