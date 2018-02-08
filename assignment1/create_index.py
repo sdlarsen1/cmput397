@@ -126,7 +126,7 @@ def main():
     for file in file_list:                   # start parsing directory
         if ".txt" in file:
             tokens = parse_file(directory+file)
-            print(tokens)
+            # print(tokens) 				# Test through this
             filename = file.split('_')          # filename: doc_#_xyz.txt
             doc_id = filename[1]
             index_tokens(c, tokens, doc_id)     # index the file
