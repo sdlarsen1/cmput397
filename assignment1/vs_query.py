@@ -6,13 +6,20 @@ from nltk.stem import *
 from nltk.stem.porter import *
 
 
-def cosine(query, document):
+def cosine(query, doc_tokens, N, c):
+    sum_tf = 0
+    sum_df = 0
+    for word in query:
+        tf = get_term_frequency(word, doc_tokens)
+        df = get_doc_frequency(word, c)
+
     return
 
 
-def tf_idf(term, document):
+def tf_idf(tf, df, N):
     # use math.log10(x)
-    return
+    tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
+    return tf_idf
 
 
 def get_number_docs(c):
@@ -41,6 +48,8 @@ def get_doc_tokens(doc_id, c):
 
 
 def get_doc_frequency(term, c):
+    term = PorterStemmer().stem(term.lower())  # compare stemmed tokens
+
     c.execute('''
     SELECT p.doc_id, count(p.token_id)
     FROM Token t, Posting p
@@ -55,6 +64,7 @@ def get_doc_frequency(term, c):
 
 def get_term_frequency(term, doc_tokens):
     term = PorterStemmer().stem(term.lower())  # compare stemmed tokens
+    
     count = 0
     for token in doc_tokens:
         if term == token:
@@ -82,16 +92,18 @@ def main():
         print("Error getting command line args.")
         sys.exit()
 
-    scores = {}
+    scores = {}                  # dict of docs and their score
+    magnitudes = {}              # dict of magnitudes of each vector
     doc_tokens = []
 
     N = get_number_docs(c)       # get number of docs in index
     for doc_id in range(N):
         # magic happens here
         doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
-        # print(doc_tokens)
+        print(doc_tokens)
+        magnitudes[doc_id] = len(doc_tokens)
 
-        scores[doc_id] = cosine(query, doc_tokens)
+        scores[doc_id] = cosine(query, doc_tokens, N, c)
 
     #printing happens here
 
