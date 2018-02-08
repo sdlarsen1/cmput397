@@ -3,7 +3,7 @@ import sys
 import math
 
 
-def cosine(query, document, c):
+def cosine(query, document):
     return
 
 
@@ -27,7 +27,7 @@ def get_doc_tokens(doc_id, c):
     SELECT t.token
     FROM token t, posting p
     WHERE t.token_id = p.token_id
-    AND p.doc_id=?;
+    AND p.doc_id = ?;
     ''', (doc_id,))
 
     tokens = []
@@ -35,6 +35,19 @@ def get_doc_tokens(doc_id, c):
         tokens.append(token[0])
 
     return tokens
+
+
+def get_doc_frequency(term, c):
+    c.execute('''
+    SELECT p.doc_id, count(p.token_id)
+    FROM Token t, Posting p
+    WHERE t.token_id = p.token_id
+    AND t.token = ?
+    GROUP BY (p.doc_id);
+    ''', (term,))
+
+    freq = c.fetchone()
+    return freq[0]
 
 
 def main():
@@ -62,9 +75,10 @@ def main():
     N = get_number_docs(c)       # get number of docs in index
     for doc_id in range(N):
         # magic happens here
-        doc_tokens = get_doc_tokens(doc_id, c)
-        print(doc_tokens)
-        scores[doc_id] = cosine(query, doc_tokens, c)
+        doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
+        # print(doc_tokens)
+
+        scores[doc_id] = cosine(query, doc_tokens)
 
     #printing happens here
 
