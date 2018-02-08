@@ -1,5 +1,25 @@
 import sqlite3
 import sys
+import math
+
+
+def cosine(query, document, c):
+    return
+
+
+def tf_idf(term, document):
+    return
+
+
+def get_number_docs(c):
+    c.execute('''
+    SELECT COUNT(DISTINCT doc_id)
+    FROM Posting;
+    ''')
+
+    num = c.fetchone()
+    return num[0]
+
 
 def main():
     try:
@@ -7,23 +27,27 @@ def main():
         conn = sqlite3.connect(index)
         c = conn.cursor()
 
-        num_docs = sys.argv[2]
-        score = sys.argv[3]
+        print_num = sys.argv[2]
+        print_score = sys.argv[3]
 
         i = 4
-        terms = []
+        query = []
         while (i < len(sys.argv)):
-             terms.append(sys.argv[i])
+             query.append(sys.argv[i])
              i+=1
 
     except:
         print("Error getting command line args.")
         sys.exit()
 
-    doc = 0
-    while (doc < num_docs):
-        # do stuff
+    scores = {}
 
+    N = get_number_docs(c)       # get number of docs in index
+    for doc in range(N):
+        # magic happens here
+        scores[doc] = cosine(query, doc, c)
+
+    #printing happens here
 
     conn.close()
 
