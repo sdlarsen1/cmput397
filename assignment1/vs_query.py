@@ -2,11 +2,8 @@ import sqlite3
 import sys
 
 def main():
-    conn = sqlite3.connect("a1.db")     # open / create db
-    c = conn.cursor()                   # set up cursor
-
     try:
-        index = sys.argv[1]                  # open index
+        index = sys.argv[1]
         conn = sqlite3.connect(index)
         c = conn.cursor()
 
