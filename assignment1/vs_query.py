@@ -1,6 +1,9 @@
 import sqlite3
 import sys
 import math
+import nltk
+from nltk.stem import *
+from nltk.stem.porter import *
 
 
 def cosine(query, document):
@@ -48,6 +51,16 @@ def get_doc_frequency(term, c):
 
     freq = c.fetchone()
     return freq[0]
+
+
+def get_term_frequency(term, doc_tokens):
+    term = PorterStemmer().stem(term.lower())  # compare stemmed tokens
+    count = 0
+    for token in doc_tokens:
+        if term == token:
+            count += 1
+
+    return count
 
 
 def main():
