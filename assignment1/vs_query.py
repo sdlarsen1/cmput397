@@ -7,11 +7,16 @@ from nltk.stem.porter import *
 
 
 def cosine(query, doc_tokens, N, c):
-    sum_tf = 0
-    sum_df = 0
+
     for word in query:
-        tf = get_term_frequency(word, doc_tokens)
-        df = get_doc_frequency(word, c)
+        df_d = df_d = get_doc_frequency(word, c)
+        tf_q = get_term_frequency(word, query)        # w.r.t. the query
+        tf_idf_q = tf_idf(tf_q, df_q, N)
+
+
+        tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
+
+
 
     return
 
@@ -53,10 +58,10 @@ def get_doc_frequency(term, c):
     c.execute('''
     SELECT SUM(Count)
     FROM (SELECT COUNT(p.token_id) AS Count
-    FROM Token t, Posting p
-    WHERE t.token_id = p.token_id
-    AND t.token = ?
-    GROUP BY (p.doc_id));
+            FROM Token t, Posting p
+            WHERE t.token_id = p.token_id
+            AND t.token = ?
+            GROUP BY (p.doc_id));
     ''', (term,))
 
     freq = c.fetchone()
