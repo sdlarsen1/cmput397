@@ -4,7 +4,6 @@ import sqlite3
 import nltk
 from nltk.stem import *
 from nltk.stem.porter import *
-nltk.download('punkt')
 
 
 def init_db(c):

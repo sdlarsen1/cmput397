@@ -1,1 +1,1 @@
-In a Boolean retrieval system, stemming never lowers recall.
+Stemming increases the size of the vocabulary.

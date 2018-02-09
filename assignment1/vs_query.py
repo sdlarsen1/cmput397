@@ -1,24 +1,53 @@
 import sqlite3
 import sys
 import math
+import heapq
 import nltk
 from nltk.stem import *
 from nltk.stem.porter import *
 
 
-def cosine(query, doc_tokens, N, c):
-    sum_tf = 0
-    sum_df = 0
-    for word in query:
-        tf = get_term_frequency(word, doc_tokens)
-        df = get_doc_frequency(word, c)
+def cosine(query, scores, N, c):
 
-    return
+    length = {}             # dict of lengths for each vector
+
+    for word in query:
+        # print("-------"+word+"--------")
+        df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
+        tf_q = get_term_frequency_query(word, query)        # w.r.t. the query
+        w_q = tf_idf(tf_q, df_q, N)                   # tf_idf of word in query
+
+        for doc_id in range(N):
+            # print("-----"+str(doc_id)+"-----")
+
+            doc_tokens = get_doc_tokens(doc_id, c)
+            print(doc_tokens)
+
+            length[doc_id] = len(doc_tokens)
+
+            tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
+
+            w_d = tf_idf(tf_d, df_d, N)                 # tf_idf of word in doc
+
+            try:
+                scores[doc_id] += w_d * w_q
+            except:
+                scores[doc_id] = w_d * w_q
+
+    for doc_id in range(N):
+        scores[doc_id] /= length[doc_id]
+
+    return scores
 
 
 def tf_idf(tf, df, N):
     # use math.log10(x)
-    tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
+    if (tf > 0) and (df > 0):
+        tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
+    else:
+        tf_idf = 0
+
+    # print("tf =", tf, "df =", df, "tf_idf =", tf_idf)
     return tf_idf
 
 
@@ -52,15 +81,18 @@ def get_doc_frequency(term, c):
 
     c.execute('''
     SELECT SUM(Count)
-    FROM (SELECT COUNT(p.token_id) AS Count
-    FROM Token t, Posting p
-    WHERE t.token_id = p.token_id
-    AND t.token = ?
-    GROUP BY (p.doc_id));
+    FROM (SELECT COUNT(DISTINCT p.doc_id) AS Count
+            FROM Token t, Posting p
+            WHERE t.token_id = p.token_id
+            AND t.token = ?
+            GROUP BY (p.doc_id));
     ''', (term,))
 
     freq = c.fetchone()
-    return freq[0]
+    if freq[0] is None:
+        return 0
+    else:
+        return freq[0]
 
 
 def get_term_frequency(term, doc_tokens):
@@ -74,13 +106,37 @@ def get_term_frequency(term, doc_tokens):
     return count
 
 
+def get_term_frequency_query(term, query):
+    count = 0
+    for word in query:
+        if term == word:
+            count += 1
+
+    return count
+
+
+def print_k_highest(scores, k, print_scores):
+    largest = heapq.nlargest(k, scores, key=scores.get)
+
+    for i in range(k):
+        try:
+            print(largest[i], "\t", end="")
+            if print_scores == 'y':
+                print(scores[largest[i]])
+            else:
+                print()
+        except:
+            continue        # in case k is larger than N
+    return
+
+
 def main():
     try:
         index = sys.argv[1]
         conn = sqlite3.connect(index)
         c = conn.cursor()
 
-        print_num = sys.argv[2]
+        k = int(sys.argv[2])
         print_score = sys.argv[3]
 
         i = 4
@@ -94,19 +150,14 @@ def main():
         sys.exit()
 
     scores = {}                  # dict of docs and their score
-    magnitudes = {}              # dict of magnitudes of each vector
     doc_tokens = []
 
     N = get_number_docs(c)       # get number of docs in index
-    for doc_id in range(N):
-        # magic happens here
-        doc_tokens = get_doc_tokens(doc_id, c)    # retrieve doc tokens as list
-        print(doc_tokens)
-        magnitudes[doc_id] = len(doc_tokens)
-
-        scores[doc_id] = cosine(query, doc_tokens, N, c)
+    scores = cosine(query, scores, N, c)
+    # print(scores)
 
     #printing happens here
+    print_k_highest(scores, k, print_score)
 
     conn.close()
 
