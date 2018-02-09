@@ -12,7 +12,7 @@ def cosine(query, scores, N, c):
     magnitude = {}             # used to normalize the scores
 
     for word in query:
-        print(word)
+        # print(word)
         # print("-------"+word+"--------")
         df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
         tf_q = get_term_frequency_query(word, query)  # w.r.t. the query
@@ -40,7 +40,7 @@ def cosine(query, scores, N, c):
 
     # normalization step
     for word in query:
-        print(word)
+        # print(word)
         for key in scores.keys():
             # print(token, key)
             tf_token = get_term_frequency(word, get_doc_tokens(key, c))
