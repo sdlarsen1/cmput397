@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 import math
+import heapq
 import nltk
 from nltk.stem import *
 from nltk.stem.porter import *
@@ -115,6 +116,17 @@ def get_term_frequency_query(term, query):
 
 
 def print_k_highest(scores, k, print_scores):
+    largest = heapq.nlargest(k, scores, key=scores.get)
+
+    for i in range(k):
+        try:
+            print(largest[i], "\t", end="")
+            if print_scores == 'y':
+                print(scores[largest[i]])
+            else:
+                print()
+        except:
+            continue        # in case k is larger than N
     return
 
 
@@ -124,7 +136,7 @@ def main():
         conn = sqlite3.connect(index)
         c = conn.cursor()
 
-        k = sys.argv[2]
+        k = int(sys.argv[2])
         print_score = sys.argv[3]
 
         i = 4
