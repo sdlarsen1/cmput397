@@ -63,7 +63,7 @@ def optimize_query(query):
 		term = stemmer.stem(term.lower())
 		stemmed_words.append(term)
 		
-	print(boolean_list, stemmed_words)
+	#print(boolean_list, stemmed_words)
 	return (boolean_list, stemmed_words, 2) # 2 as last item in Tuple means more than one entry
 	
 	
@@ -71,6 +71,7 @@ def boolean_search(data_tup, conn):
 	# must account for phrase queries in boolean search...	
 	c = conn.cursor()
 	print (data_tup)
+	query = ""
 	
 	if data_tup[2] == -1:
 		return -1 #failure
@@ -88,23 +89,29 @@ def boolean_search(data_tup, conn):
 			
 	boolean = data_tup[0]
 	word = data_tup[1]
+	i = 0
 		
 	for bool_entry in boolean:
-		if bool_entry == 'AND' or bool_entry == 'OR':
-			#query = "SELECT distinct p1.doc_id FROM posting p1, posting p2, token t1, token t2 WHERE t1.token = ? " + bool_entry + " t2.token = ?"  + " AND p1.token_id = t1.token_id AND p2.token_id = t2.token_id AND p1.doc_id = p2.doc_id;" 
-			#c.execute(query, (word[0], word[1]))
-			query = "SELECT * FROM posting p1"
-			c.execute(query)
-			conn.commit()
+		if bool_entry == 'AND':
+			query = "SELECT distinct p1.doc_id as Results FROM posting p1, posting p2, token t1, token t2 WHERE t1.token = ? " + bool_entry + " t2.token = ?"  + " AND p1.token_id = t1.token_id AND p2.token_id = t2.token_id AND p1.doc_id = p2.doc_id;" 
+		else: # bool_entry == 'OR':
+			query = "SELECT distinct p1.doc_id as Results FROM posting p1, token t1 WHERE (t1.token = ? OR t1.token = ?) AND (p1.token_id = t1.token_id);"
 			
+		c.execute(query, (word[i], word[i+1]))
+		#query = "SELECT * FROM posting p1;"
+		#c.execute(query)
+		conn.commit()
+		
+		#print(word)
+		rows = c.fetchall()
+		print(rows)
+		print(query)
+		conn.commit()
+
+		for each in rows:
 			print(word)
-			rows = c.fetchall()
-			print(rows)
-			print(query)
-	
-			for each in rows:
-				print("DocID:", each[0])
-			return 0 #success
+			print("DocID:", each[0])
+		return 0 #success
 			
 		#else: #need to implement NOT here
 		#	query = "SELECT distinct p1.doc_id FROM posting p1, token t1 WHERE t1.token <> ? "  + " AND p1.token_id = t1.token_id;"
