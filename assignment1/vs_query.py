@@ -12,6 +12,7 @@ def cosine(query, scores, N, c):
     magnitude = {}             # used to normalize the scores
 
     for word in query:
+        print(word)
         # print("-------"+word+"--------")
         df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
         tf_q = get_term_frequency_query(word, query)  # w.r.t. the query
@@ -26,7 +27,7 @@ def cosine(query, scores, N, c):
             doc_tokens = get_doc_tokens(doc_id, c)
             # print(doc_tokens)
 
-            length[doc_id] = len(doc_tokens)
+            # magnitude[doc_id] = len(doc_tokens)
 
             tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
 
@@ -37,13 +38,24 @@ def cosine(query, scores, N, c):
             except:
                 scores[doc_id] = w_d * w_q
 
-    # for token in get_all_tokens(c):
-    #     for key in scores.keys():
-    #         tf_token = get_term_frequency(token, )
-    #         magnitude[key] =
+    # normalization step
+    for word in query:
+        print(word)
+        for key in scores.keys():
+            # print(token, key)
+            tf_token = get_term_frequency(word, get_doc_tokens(key, c))
+            df_token = get_doc_frequency(word, c)
 
+            try:
+                magnitude[key] += tf_idf(tf_token, df_token, N)**2
+            except:
+                magnitude[key] = tf_idf(tf_token, df_token, N)**2
+
+
+    # normalize scores
     for key in scores.keys():
-        scores[key] /= magnitude[key]
+        scores[key] /= math.sqrt(magnitude[key])
+        # scores[key] /= magnitude[key]
 
     return scores
 
