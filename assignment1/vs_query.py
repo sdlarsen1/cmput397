@@ -12,16 +12,16 @@ def cosine(query, scores, N, c):
     length = {}             # dict of lengths for each vector
 
     for word in query:
-        print("-------"+word+"--------")
+        # print("-------"+word+"--------")
         df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
         tf_q = get_term_frequency_query(word, query)        # w.r.t. the query
         w_q = tf_idf(tf_q, df_q, N)
 
         for doc_id in range(N):
-            print("-----"+str(doc_id)+"-----")
+            # print("-----"+str(doc_id)+"-----")
 
             doc_tokens = get_doc_tokens(doc_id, c)
-            print(doc_tokens)
+            # print(doc_tokens)
 
             length[doc_id] = len(doc_tokens)
 
@@ -42,7 +42,7 @@ def cosine(query, scores, N, c):
 
 def tf_idf(tf, df, N):
     # use math.log10(x)
-    print("tf =", tf, "df =", df)
+    # print("tf =", tf, "df =", df)
     if (tf > 0) and (df > 0):
         tf_idf = (1 + math.log10(tf)) * math.log10(N / df)
     else:
@@ -154,7 +154,7 @@ def main():
 
     N = get_number_docs(c)       # get number of docs in index
     scores = cosine(query, scores, N, c)
-    print(scores)
+    # print(scores)
 
     #printing happens here
     print_k_highest(scores, k, print_score)

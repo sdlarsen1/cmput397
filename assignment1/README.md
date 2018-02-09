@@ -16,4 +16,8 @@ To do so:
 ```
 
 
-One way to run part 1: python3 create_index.py path/to/dir/
+To run part 1: `python3 create_index.py path/to/dir/`
+
+To run part 2: `python3 `
+
+To run part 3: `python3 vs_query.py a1.db [k] [scores] [term_1] [term_2] ... [term_n]`
