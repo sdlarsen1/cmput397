@@ -12,13 +12,13 @@ def cosine(query, scores, N, c):
     length = {}             # dict of lengths for each vector
 
     for word in query:
-        # print("-------"+word+"--------")
+        print("-------"+word+"--------")
         df_d = df_q = get_doc_frequency(word, c)      # df_q and df_d are the same, but for clarity
-        tf_q = get_term_frequency_query(word, query)        # w.r.t. the query
+        tf_q = get_term_frequency_query(word, query)  # w.r.t. the query
         w_q = tf_idf(tf_q, df_q, N)                   # tf_idf of word in query
 
         for doc_id in range(N):
-            # print("-----"+str(doc_id)+"-----")
+            print("-----"+str(doc_id)+"-----")
 
             doc_tokens = get_doc_tokens(doc_id, c)
             print(doc_tokens)
@@ -27,7 +27,7 @@ def cosine(query, scores, N, c):
 
             tf_d = get_term_frequency(word, doc_tokens)   # w.r.t. the document
 
-            w_d = tf_idf(tf_d, df_d, N)                 # tf_idf of word in doc
+            w_d = tf_idf(tf_d, df_d, N)                   # tf_idf of word in doc
 
             try:
                 scores[doc_id] += w_d * w_q
@@ -47,7 +47,7 @@ def tf_idf(tf, df, N):
     else:
         tf_idf = 0
 
-    # print("tf =", tf, "df =", df, "tf_idf =", tf_idf)
+    print("tf =", tf, "df =", df, "tf_idf =", tf_idf)
     return tf_idf
 
 
