@@ -1,4 +1,6 @@
 import sqlite3
+import sys
+import os
 
 def get_num_tokens(c):
     c.execute('''
@@ -40,10 +42,26 @@ def print_posting(posting):
 
 
 def main():
-    conn = sqlite3.connect("a1.db")     # open / create db
-    c = conn.cursor()                   # set up cursor
 
-    N = get_num_tokens(c)               # number of tokens
+    try:
+        db = sys.argv[1]
+
+        conn = sqlite3.connect(db)          # open / create db
+        c = conn.cursor()                   # set up cursor
+
+    except:
+        print("Error connecting to DB:", db)
+        sys.exit()
+
+    try:
+        N = get_num_tokens(c)               # number of tokens
+    except:
+        print("Invalid DB file or no index was created.")
+        choice = input("Would you like to remove the invalid DB? (y/n) ")
+        if choice == 'y':
+            os.system("rm "+db)
+            print("DB removed")
+        sys.exit()
 
     for token_id in range(N):
         posting = get_posting(token_id, c)
