@@ -104,3 +104,4 @@ ENV/
 cmput397_2k_movies
 *.db
 .idea
+assignment2/test/
