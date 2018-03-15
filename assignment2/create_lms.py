@@ -48,10 +48,9 @@ def parse_file(filename):
     tokens = nltk.word_tokenize(content)
     stemmer = PorterStemmer()
     stemmed_tokens = []
-    # punctuation = [',', '.', ';', ':', "'", '"', ' ']
 
     for token in tokens:
-        if not token.isalpha():                    # ignore punctuation
+        if not token.isalpha():                    # ignore punctuation, non-alpha
             continue
 
         token = stemmer.stem(token.lower())         # using Porter stemmer
