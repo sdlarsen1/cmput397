@@ -25,7 +25,8 @@ def init_db(c):
             CREATE TABLE MLE (
             token_id INT,
             doc_id INT,
-            MLE FLOAT,
+            tf INT,
+            mle FLOAT,
             FOREIGN KEY (token_id) REFERENCES Token(token_id)
             );''')
 
@@ -92,7 +93,7 @@ def index_tokens(c, tokens, doc_id):
 
         c.execute('''
             INSERT INTO MLE
-            VALUES (?, ?, ?);''', (token_id, doc_id, mle,))
+            VALUES (?, ?, ?, ?);''', (token_id, doc_id, tf, mle,))
 
 
 def in_index(token, c):
