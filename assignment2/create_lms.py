@@ -61,7 +61,6 @@ def parse_file(filename):
     return stemmed_tokens
 
 
-# TODO -- fix for MLE instead of offset
 def index_tokens(c, tokens, doc_id):
     seen = set()                            # keep track of seen tokens with a set
     for token in tokens:
@@ -95,7 +94,6 @@ def index_tokens(c, tokens, doc_id):
         c.execute('''
             INSERT INTO MLE
             VALUES (?, ?, ?);''', (token_id, doc_id, mle,))
-
 
 
 def in_index(token, c):
