@@ -84,7 +84,7 @@ def index_tokens(c, tokens, doc_id):
                 VALUES (?,?);''', (token, token_id,))
 
         # MLE calculated here
-        tf = 0
+        tf = 0                      # tf of given term
         for x in tokens:
             if token == x:
                 tf += 1
