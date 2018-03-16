@@ -57,7 +57,7 @@ def get_tf_mle(doc_id, term, c):
 def print_top_k(scores, k):
     largest = heapq.nlargest(k, scores, key=scores.get)
 
-    print(" Rank | Doc | Score")
+    print(" Rank | Doc | Score ")
     for i in range(k):
         try:
             print(' ', i+1, '\t', largest[i], "\t%.5f" %scores[largest[i]])
