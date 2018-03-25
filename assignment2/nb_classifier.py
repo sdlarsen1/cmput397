@@ -125,7 +125,11 @@ def main():
 		s = MLStripper()
 		s.feed(email_f_text)
 		text_no_HTML = s.get_data()
-		spam_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces
+		# spam_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces (list of lists method)
+		email_no_HTML = text_no_HTML.split() # split HTML-less text without spaces
+		for word in email_no_HTML:
+			spam_vocab.append(word) # (list of words method)
+		
 		
 	#HAM CLASS	
 	for ham_file in ham_files_l:
@@ -136,7 +140,10 @@ def main():
 		s = MLStripper()
 		s.feed(email_f_text)
 		text_no_HTML = s.get_data()
-		ham_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces
+		# spam_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces (list of lists method)
+		email_no_HTML = text_no_HTML.split() # split HTML-less text without spaces
+		for word in email_no_HTML:
+			ham_vocab.append(word) # (list of words method)
 		
 	vocab = spam_vocab + ham_vocab
 	
@@ -144,6 +151,13 @@ def main():
 	# each element of the main list is a list of all words in the particular document it was for; if required, I can track which document correlates to which text.
 	# Should I remove the puncuation from vocab?? (using parser from assignment1 ?)
 	#print(ham_vocab)
+	
+	len_vocab = len(vocab)
+	len_vocab_no_dupl = set(vocab)
+	
+	unique_vocab_size = len(len_vocab_no_dupl)
+	print(unique_vocab_size)
+	
 	
 	
 	"""
@@ -176,10 +190,11 @@ def main():
 	"""
 	
 	term_count_dic = {}
-
-	for specific_email in vocab:
+	
+	# list of lists method term_count
+	"""for specific_email in ham_vocab:
 		for word in specific_email:
-			for s_email in ham_vocab:
+			for s_email in vocab:
 				for w in s_email:
 					if word == w:
 						if word in term_count_dic:
@@ -188,9 +203,41 @@ def main():
 						else:
 							term_count_dic[word] = 0
 			
-	print(term_count_dic)
+	print(term_count_dic) """
+	
 		
+	# list of words method term_count
+	ham_tc_dic = {}
+	for word in ham_vocab:
+		if word in ham_tc_dic:
+			ham_tc_dic[word]+=1
+			print(word, ham_tc_dic[word])
+		else:
+			ham_tc_dic[word] = 0
+			print(word, ham_tc_dic[word])
+		
+	spam_tc_dic = {}
+	for word in spam_vocab:
+		if word in spam_tc_dic:
+			spam_tc_dic[word]+=1
+			print(word, spam_tc_dic[word])
+		else:
+			spam_tc_dic[word] = 0
+			print(word, spam_tc_dic[word])		
 			
+	cond_prob_ham = {}
+	cond_prob_spam = {}
+	
+	for word in ham_tc_dic:
+		cond_prob_ham[word] = (ham_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
+	
+	for word in spam_tc_dic:
+		cond_prob_spam[word] = (spam_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
+	
+	#print(cond_prob_ham)	
+	
+	
+		
 			
 			
 	# Multiline comment a test		
