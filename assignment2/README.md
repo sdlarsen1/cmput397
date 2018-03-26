@@ -16,3 +16,6 @@ TODO:
 ### print_lms.py instructions
 - to run the program, enter: `python3 print_lms.py [path/to/data/]`
     - the MLE scores are rounded to 5 decimal places for readability, however they are stored in their entirety
+
+### query_lms.py instructions
+- to run the program, enter: `python3 query_lms.py [path/to/data] k [white-space separated query]`

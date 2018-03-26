@@ -73,7 +73,7 @@ def main():
 
         i = 3
         query = []
-        while i < len(sys.argv):
+        while i < len(sys.argv):    # TODO -- handle quotes
             query.append(sys.argv[i])           # get query terms
             i+=1
 

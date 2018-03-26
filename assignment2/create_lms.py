@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 import os
+import re
 import nltk
 from nltk.stem import *
 from nltk.stem.porter import *
@@ -132,16 +133,22 @@ def main():
     init_db(c)                                  # initialize the db
 
     print("Building index...")
+    file_counter = 0
     for file in file_list:
-        if "nytimes" in file:
-            # TODO parsing for NY Times
-            return
-        elif ".txt" in file:
-            tokens = parse_file(file_dir+file)
-            # print(tokens)
+
+        match = re.search(r'doc_\d+_\w+\.txt', file)     # check if docs name meets "doc_##_xyz.txt"
+
+        if match is not None:
             filename = file.split('_')
             doc_id = filename[1]
-            index_tokens(c, tokens, doc_id)
+            doc_name = filename[2]
+        else:
+            doc_id = file_counter
+            doc_name = file
+
+        tokens = parse_file(file_dir+file)
+        index_tokens(c, tokens, doc_id)
+        file_counter += 1;
 
     print("Committing changes and closing connection.")
     conn.commit()
