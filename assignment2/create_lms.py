@@ -141,10 +141,10 @@ def main():
         if match is not None:
             filename = file.split('_')
             doc_id = filename[1]
-            doc_name = filename[2]
+            # doc_name = filename[2]
         else:
             doc_id = file_counter
-            doc_name = file
+            # doc_name = file
 
         tokens = parse_file(file_dir+file)
         index_tokens(c, tokens, doc_id)
