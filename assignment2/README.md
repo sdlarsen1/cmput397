@@ -24,6 +24,3 @@ TODO:
 - to run the program, enter: 'python3 nb_classifier.py [path/to/train/data] [path/to/test/data]'
 	- for example, enter: 'python3 nb_classifier.py trec-397/data/train/ trec-397/data/test/'
 	- give this file approx. a minute to run.
-
-
- python3 nb_classifier.py trec-397/data/train/ trec-397/data/test/
