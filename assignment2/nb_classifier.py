@@ -8,9 +8,11 @@ import os, os.path
 import re
 from html.parser import HTMLParser
 import codecs
-import nltk
-from nltk.stem import *
-from nltk.stem.porter import *
+import math
+
+# all credit for the HTML Parser goes to: 
+# https://stackoverflow.com/questions/11061058/using-htmlparser-in-python-3-2
+# https://stackoverflow.com/questions/753052/strip-html-from-strings-in-python
 
 class MLStripper(HTMLParser):
 	def __init__(self):
@@ -23,15 +25,11 @@ class MLStripper(HTMLParser):
 		
 	def get_data(self):
 		return ''.join(self.fed)
-		
-# all credit for the HTML Parser goes to: 
-# https://stackoverflow.com/questions/11061058/using-htmlparser-in-python-3-2
-# https://stackoverflow.com/questions/753052/strip-html-from-strings-in-python
 
 def main():
 	classes = ("SPAM", "HAM",)
 	num_classes = len(classes)
-	print(num_classes)
+	#print(num_classes)
 	
 	# find and open directory for both training and testing
 	try:
@@ -47,11 +45,12 @@ def main():
 	
 	# train_dir, test_dir are directories with all the documents required for both training() and testing
 		
-	print(train_dir, test_dir)
+	#print(train_dir, test_dir)
 	
-	num_docs = len(os.listdir(train_dir)) # os.listdir(dir_name) returns a list of every single file in dir_name directory
+	num_docs = len(os.listdir(train_dir)) 
+	#os.listdir(dir_name) returns a list of every single file in dir_name directory
 
-	#side snippet: 
+	#side snippet (ignore):
 	"""
 	x = 0
 	for name in os.listdir(train_dir):
@@ -60,11 +59,11 @@ def main():
 	
 	print(x)
 	
-	"""			
 	# print(x) prints num_docs. This is because these are not "actual"" files, at least in python3 on mac OS
+	"""			
 	
-	num_docs-=1 # remove index file from doc_num 
-	print(num_docs)
+	num_docs-=1 # remove index file from num_of_docs
+	#print(num_docs)
 	
 	# count num of docs in each class:
 	
@@ -73,48 +72,36 @@ def main():
 	
 	#test_idx_file = open(test_dir + '/' + 'index')
 	
+	############################ NB TRAINING #########################
+	
+	#Calculating prior probabilities:
 	prior_prob = {"spam": 0, "ham": 0}
 	
+	
 	num_docs_spam = len(re.findall("spam", train_idx_text))
-	print(num_docs_spam)
+	#print(num_docs_spam)
 	
 	num_docs_ham = num_docs - num_docs_spam
-	print(num_docs_ham)
+	#print(num_docs_ham)
 	
 	prior_prob["spam"] = num_docs_spam/num_docs
 	prior_prob["ham"] = num_docs_ham/num_docs
 	
-	print(prior_prob)
+	#print(prior_prob)
 	
+	#List of spam files, ham files and all files in the train directory
 	spam_files_l = re.findall("spam (.+)", train_idx_text)
 	ham_files_l = re.findall("ham (.+)", train_idx_text)
+	
+	train_all_files_l = re.findall("(spam|ham) (.+)", train_idx_text)
+	#print(train_all_files_l)
 
-	# Vocabulary accumulation 
+	# Vocabulary accumulation
 	
 	vocab = []
 	spam_vocab = []
 	ham_vocab = []
 	
-	directory = os.fsencode(train_dir)
-	# TESTING HOW MANY FILES WERE PARSED: 
-	#i = 0
-	
-	"""
-	for file in os.listdir(directory):
-		filename = os.fsdecode(file)
-		if (filename != "index"): 
-			with codecs.open((train_dir + '/' + filename), 'r', encoding='utf-8', errors='ignore') as email_file:  # e.g. read trec-397/data/train/inmail.1, .../inmail.2, and so on 
-			# ignores all characters that are NOT utf-8 type
-				email_f_text = email_file.read()
-			
-				# removing HTML from emails: 
-				s = MLStripper()
-				s.feed(email_f_text)
-				text_no_HTML = s.get_data()
-				vocab.append(text_no_HTML.split()) # split HTML-less text without spaces
-				# TESTING how many files were parsed: 
-				#i+=1 
-	"""
 	
 	#SPAM CLASS
 	for spam_file in spam_files_l:
@@ -147,122 +134,197 @@ def main():
 		
 	vocab = spam_vocab + ham_vocab
 	
-	print(len(vocab), len(spam_vocab), len(ham_vocab)) # each vocab (vocab, spam_vocab, ham_vocab) is a list of lists:
-	# each element of the main list is a list of all words in the particular document it was for; if required, I can track which document correlates to which text.
-	# Should I remove the puncuation from vocab?? (using parser from assignment1 ?)
-	#print(ham_vocab)
+	#print(len(vocab), len(spam_vocab), len(ham_vocab)) 
+	# each vocab (vocab, spam_vocab, ham_vocab) is a list of words for vocab, spam, and ham respectively
 	
 	len_vocab = len(vocab)
-	len_vocab_no_dupl = set(vocab)
+	vocab_no_dupl = set(vocab) # set() removes duplicates from the list of words in vocab
 	
-	unique_vocab_size = len(len_vocab_no_dupl)
-	print(unique_vocab_size)
-	
-	
-	
-	"""
-	stemmed_tokens = []
-	for content in ham_vocab:
-		for word in content:
-			#tokens = nltk.word_tokenize(word)
-			stemmer = PorterStemmer()
-			punctuation = [',', '.', ';', ':', "'", '"']
-			
-	
-			if word in punctuation:                    # ignore punctuation
-				continue
-
-			word = stemmer.stem(word.lower())         # using Porter stemmer
-			stemmed_tokens.append(word)
-
-	print(len(stemmed_tokens)) 
-	
-	#tokens = nltk.word_tokenize(word) increases # of words... just reduces efficiency and time
-	#e.g. 2162977 - 1708230 more words with this code with tokens = nltk.word_tokenize(word)
-	# 1708230 - 1696138 less words with this code with no tokens = nltk.word_tokenize(word)
-	(for ham_vocab)
-	
-	i=0
-	for lis in ham_vocab:
-		for word in lis:
-			i+=1
-	print(i)
-	"""
-	
-	term_count_dic = {}
-	
-	# list of lists method term_count
-	"""for specific_email in ham_vocab:
-		for word in specific_email:
-			for s_email in vocab:
-				for w in s_email:
-					if word == w:
-						if word in term_count_dic:
-							print(word, term_count_dic[word])
-							term_count_dic[word]+=1
-						else:
-							term_count_dic[word] = 0
-			
-	print(term_count_dic) """
-	
+	unique_vocab_size = len(vocab_no_dupl) # size of unique_vocab 
+	#print(unique_vocab_size)
 		
 	# list of words method term_count
 	ham_tc_dic = {}
+	
 	for word in ham_vocab:
 		if word in ham_tc_dic:
 			ham_tc_dic[word]+=1
-			print(word, ham_tc_dic[word])
+			#print(word, ham_tc_dic[word])
 		else:
-			ham_tc_dic[word] = 0
-			print(word, ham_tc_dic[word])
+			ham_tc_dic[word] = 1
+			#print(word, ham_tc_dic[word])
 		
 	spam_tc_dic = {}
 	for word in spam_vocab:
 		if word in spam_tc_dic:
 			spam_tc_dic[word]+=1
-			print(word, spam_tc_dic[word])
+			#print(word, spam_tc_dic[word])
 		else:
-			spam_tc_dic[word] = 0
-			print(word, spam_tc_dic[word])		
+			spam_tc_dic[word] = 1
+			#print(word, spam_tc_dic[word])		
 			
 	cond_prob_ham = {}
 	cond_prob_spam = {}
 	
+	#Computing denominators in conditional probability formula
+	#Essentially the total length of all tokens of spam/ham vocab lists + the number of unique terms in the vocab
+	
+	ham_denom = 0
+	for word in vocab_no_dupl:
+		if word in ham_tc_dic:
+			ham_denom+=ham_tc_dic[word]
+		ham_denom+=1
+		
+	spam_denom = 0
+	for word in vocab_no_dupl:
+		if word in spam_tc_dic:
+			spam_denom+=spam_tc_dic[word]
+		spam_denom+=1
+	
+	# COMPUTATION OF COND_PROB: 
+	
 	for word in ham_tc_dic:
-		cond_prob_ham[word] = (ham_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
+		#cond_prob_ham[word] = (ham_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
+		cond_prob_ham[word] = (ham_tc_dic[word] + 1)/(ham_denom)
 	
 	for word in spam_tc_dic:
-		cond_prob_spam[word] = (spam_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
-	
-	#print(cond_prob_ham)	
-	
-	
+		#cond_prob_spam[word] = (spam_tc_dic[word] + 1)/((len_vocab)+unique_vocab_size)
+		cond_prob_spam[word] = (spam_tc_dic[word] + 1)/(spam_denom)
 		
+		
+	
+				############################################### TESTING ###################################
+	
+	
+	
+	# #################### TESTING FOR TRAIN FOLDER ###################################
+	
+	
+	NB_results = []
+	for a_file_tuple in train_all_files_l:
+		ham_score = math.log(prior_prob["ham"], 10) # SCORE FOR HAM
+		spam_score = math.log(prior_prob["spam"], 10) # SCORE FOR SPAM
+		doc_vocab = []
+		
+		with codecs.open((train_dir + '/' + a_file_tuple[1]), 'r', encoding='utf-8', errors='ignore') as email_file:  # e.g. read trec-397/data/train/inmail.1, ../inmail.2, and so on 
+			#ignores all characters that are NOT utf-8 type
+			email_f_text = email_file.read()
+			# removing HTML from emails: 
+			s = MLStripper()
+			s.feed(email_f_text)
+			text_no_HTML = s.get_data()
+			# spam_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces (list of lists method)
+			email_no_HTML = text_no_HTML.split() # split HTML-less text without spaces
+			for word in email_no_HTML:
+				doc_vocab.append(word) # (list of words method)
+		
+		for word in doc_vocab:
+			if word in cond_prob_ham:
+				ham_score+=math.log(cond_prob_ham[word],10) 
+	
+			# else do nothing
+		for word in doc_vocab:
+			if word in cond_prob_spam:
+				spam_score+=math.log(cond_prob_spam[word],10)
+			# else do nothing
+				
+		if ham_score < spam_score:
+			NB_results.append((a_file_tuple[0], a_file_tuple[1], "ham",))
+		else:
+			NB_results.append((a_file_tuple[0], a_file_tuple[1], "spam",))
 			
+		# assigning classes according to NB algorithm	
+		
+		# concatenating a_file_tuple with whether the document is supposed to be "ham" or "spam" according to the Naive Bayes algorithm
+		# therefore:
+		# a_file_tuple[0] = whether or not the file is actually HAM/SPAM
+		# a_file_tuple[1] = the file 
+		# a_file_tuple[2] = what NB algorithm determines the file to be
+		
+	accuracy_counter = 0
+	#print(NB_results)
+		
+	for a_file_tuple in NB_results:
+		if (a_file_tuple[0] == a_file_tuple[2]):
+			accuracy_counter+=1
+		# else do nothing
+		#else:
+			#print(a_file_tuple[0], a_file_tuple[2])
+	
+	#print(len(NB_results), len(train_all_files_l))
+		
+	accuracy = (accuracy_counter/(len(train_all_files_l)))
+	print("Training accuracy:", '%.2f' % float(accuracy*100), "%") 
+	
+	
+	
+	#################### TESTING FOR TEST FOLDER #########################################
+	
+	
+	
+	test_idx_file = open((test_dir + '/' + 'index'), 'r') # index file
+	test_idx_text = test_idx_file.read()
+	test_all_files_l = re.findall("(spam|ham) (.+)", test_idx_text)
+	NB_results_test = []
+	
+	for a_file_tuple in test_all_files_l:
+		ham_score = math.log(prior_prob["ham"], 10)
+		spam_score = math.log(prior_prob["spam"], 10)
+		doc_vocab = []
+		
+		with codecs.open((test_dir + '/' + a_file_tuple[1]), 'r', encoding='utf-8', errors='ignore') as email_file:  # e.g. read trec-397/data/train/inmail.1, ../inmail.2, and so on 
+			#ignores all characters that are NOT utf-8 type
+			email_f_text = email_file.read()
+			# removing HTML from emails: 
+			s = MLStripper()
+			s.feed(email_f_text)
+			text_no_HTML = s.get_data()
+			# spam_vocab.append(text_no_HTML.split()) # split HTML-less text without spaces (list of lists method)
+			email_no_HTML = text_no_HTML.split() # split HTML-less text without spaces
+			for word in email_no_HTML:
+				doc_vocab.append(word) # (list of words method)
+		
+		for word in doc_vocab:
+			if word in cond_prob_ham:
+				ham_score+=math.log(cond_prob_ham[word],10)
+			# else do nothing
 			
-	# Multiline comment a test		
-	"""
-	test = open((train_dir + '/' + 'inmail.1'), 'r')
-	testt = test.read()
-	#print(testt)
-
-	s = MLStripper()
-	s.feed(testt)
-	text_no_HTML = s.get_data()
-	print(text_no_HTML)
-	
-	vocab.append(text_no_HTML.split())
-	"""
-	
-	# TESTING how many files were parsed: 
-	#print(i)
-	
-	#print(vocab)
+		for word in doc_vocab:
+			if word in cond_prob_spam:
+				spam_score+=math.log(cond_prob_spam[word],10)
+			# else do nothing
+				
+		if ham_score < spam_score:
+			NB_results_test.append((a_file_tuple[0], a_file_tuple[1], "ham",))
+		else:
+			NB_results_test.append((a_file_tuple[0], a_file_tuple[1], "spam",))
+			
+		# assigning classes according to NB algorithm	
 		
-
+		# concatenating a_file_tuple with whether the document is supposed to be "ham" or "spam" according to the Naive Bayes algorithm
+		# therefore:
+		# a_file_tuple[0] = whether or not the file is actually HAM/SPAM
+		# a_file_tuple[1] = the file 
+		# a_file_tuple[2] = what NB algorithm determines the file to be
 		
+	accuracy_counter = 0
+	#print(NB_results)
+		
+	for a_file_tuple in NB_results_test:
+		if (a_file_tuple[0] == a_file_tuple[2]):
+			accuracy_counter+=1
+		# else do nothing
+		#else:
+			#print(a_file_tuple[0], a_file_tuple[2])
+	
+	#print(len(NB_results_test), len(test_all_files_l))
+		
+	accuracy = (accuracy_counter/(len(test_all_files_l)))
+	print("Test accuracy:", '%.2f' % float(accuracy*100), "%") 
+				
 	
 	train_idx_file.close()
+	test_idx_file.close()
 	
 if __name__ == "__main__":
 	main()
