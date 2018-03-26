@@ -19,6 +19,7 @@ TODO:
 
 ### query_lms.py instructions
 - to run the program, enter: `python3 query_lms.py [path/to/data] k [white-space separated query]`
+    - queries are assumed to not be encircled by quotation marks
 
 ### nb_classifier.py instructions
 - to run the program, enter: `python3 nb_classifier.py [path/to/train/data] [path/to/test/data]`
