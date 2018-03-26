@@ -19,3 +19,11 @@ TODO:
 
 ### query_lms.py instructions
 - to run the program, enter: `python3 query_lms.py [path/to/data] k [white-space separated query]`
+
+### nb_classifier.py instructions
+- to run the program, enter: 'python3 nb_classifier.py [path/to/train/data] [path/to/test/data]'
+	- for example, enter: 'python3 nb_classifier.py trec-397/data/train/ trec-397/data/test/'
+	- give this file approx. a minute to run.
+
+
+ python3 nb_classifier.py trec-397/data/train/ trec-397/data/test/
